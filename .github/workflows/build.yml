@@ -1,7 +1,5 @@
 name: Build Android APK
 
-# Runs automatically whenever you push code to the main branch,
-# and can also be triggered manually from the Actions tab.
 on:
   push:
     branches: [ main ]
@@ -19,18 +17,30 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install autotools (needed by some python-for-android recipes)
-        run: sudo apt-get update && sudo apt-get install -y autoconf automake libtool libtool-bin pkg-config
-
-      - name: Build the APK with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
         with:
-          command: buildozer android debug
-          buildozer_version: stable
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install system build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            autoconf automake libtool libtool-bin pkg-config \
+            build-essential git zip unzip openjdk-17-jdk \
+            libffi-dev libssl-dev zlib1g-dev \
+            libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
+            libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev
+
+      - name: Install Buildozer and Cython
+        run: pip install --upgrade buildozer cython
+
+      - name: Build the APK
+        run: buildozer -v android debug
 
       - name: Upload the built APK
         uses: actions/upload-artifact@v4
         with:
           name: resume-builder-apk
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
