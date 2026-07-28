@@ -1,86 +1,68 @@
 [app]
 
-# (str) Title of your application
+# Application title
 title = Resume Builder
 
-# (str) Package name
+# Package name
 package.name = resumebuilder
 
-# (str) Package domain
+# Package domain
 package.domain = com.wondxpt
 
-
-# (str) Source code directory
+# Source directory
 source.dir = .
 
-# (list) Source files to include
+# Included file extensions
 source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf,json
 
-
-# (str) Application version
+# Version
 version = 1.0
 
+# Requirements
+requirements = python3==3.11,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow==10.4.0,plyer
 
-# (list) Application requirements
-requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow==10.4.0,plyer
-
-
-# (str) Supported orientation
+# Orientation
 orientation = portrait
 
-
-# (bool) Display fullscreen
+# Fullscreen
 fullscreen = 0
-
 
 
 [buildozer]
 
-
-# (int) Log level
+# Log level
 log_level = 2
 
-
-# (str) Warn if running as root
+# Don't stop for root warning
 warn_on_root = 1
-
 
 
 [android]
 
-
-# (bool) Enable Android app
-enable_android = True
-
-
-# (str) Android API version
+# Android API
 android.api = 31
 
-
-# (str) Minimum Android API
+# Minimum Android API
 android.minapi = 21
 
-
-# (str) Android NDK version
+# Use NDK version compatible with Python 3.11
 android.ndk = 25b
 
-
-# (str) Android SDK path
-# automatically detected by GitHub Actions
-
-
-# (list) Architectures
+# Architectures
 android.archs = arm64-v8a, armeabi-v7a
 
+# Enable AndroidX
+android.enable_androidx = True
 
-# (bool) Accept SDK licenses
-android.accept_sdk_license = True
-
-
-# (str) Android permissions
+# Permissions
 android.permissions = INTERNET
 
 
+# Java compile options
+android.gradle_dependencies = androidx.appcompat:appcompat:1.6.1
 
-# (bool) Use androidx
-android.enable_androidx = True
+
+[p4a]
+
+# Avoid Python 3.14 problem
+android.api = 31
