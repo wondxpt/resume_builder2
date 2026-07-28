@@ -34,7 +34,7 @@ jobs:
             libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev
 
       - name: Install Buildozer and Cython
-        run: pip install --upgrade "buildozer==1.5.0" "python-for-android==2024.1.21" cython
+        run: pip install --upgrade "buildozer==1.5.0" cython
 
       - name: Build the APK
         run: yes | buildozer -v android debug
