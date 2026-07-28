@@ -1,40 +1,75 @@
 [app]
 
+# (str) Title of your application
 title = Resume Builder
+
+# (str) Package name
 package.name = resumebuilder
+
+# (str) Package domain
 package.domain = com.wondxpt
 
+# (str) Source code directory
 source.dir = .
-source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf
 
+# (list) Source files to include
+source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf,json
+
+# (str) Application version
 version = 1.0
 
-requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow,plyer,android
+# (list) Application requirements
+requirements = python3==3.11,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow==10.4.0,plyer
 
+# Force python version
+android.python_version = 3.11
+
+# (str) Supported orientation
 orientation = portrait
-fullscreen = 0
 
-icon.filename = %(source.dir)s/icon.png
-presplash.filename = %(source.dir)s/presplash.png
 
-[android]
+# (bool) Copy library files
+android.copy_libs = 1
 
-android.api = 35
-android.minapi = 24
+
+# Android settings
+
+[buildozer]
+
+log_level = 2
+
+warn_on_root = 1
+
+
+# (str) Android API
+android.api = 31
+
+# Minimum Android version
+android.minapi = 21
+
+# NDK version compatible with buildozer
 android.ndk = 25b
-p4a.branch = 2024.01.21
 
-android.archs = arm64-v8a, armeabi-v7a
+# Architecture
+android.archs = arm64-v8a,armeabi-v7a
 
-android.permissions = READ_MEDIA_IMAGES, READ_EXTERNAL_STORAGE
 
-android.presplash_color = #FFFFFF
+# Permissions
 
-android.enable_androidx = True
+android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
 
+
+# Android theme
+android.private_storage = True
+
+
+# Avoid old cache problems
 android.accept_sdk_license = True
 
 
-[buildozer]
-log_level = 2
-warn_on_root = 1
+# Debug mode
+android.debug_artifact = apk
+
+
+# Use gradle
+p4a.branch = master
