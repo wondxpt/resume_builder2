@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build APK
 
 on:
   push:
@@ -13,75 +13,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
         with:
-          python-version: "3.11"
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Install system dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y \
-            build-essential \
-            git \
-            zip \
-            unzip \
-            autoconf \
-            automake \
-            libtool \
-            pkg-config \
-            libffi-dev \
-            libssl-dev \
-            zlib1g-dev
-
-      - name: Install Buildozer & Cython
-        run: |
-          python -m pip install --upgrade pip
-          pip install buildozer cython
-
-      - name: Setup Android SDK and accept licenses
-        run: |
-          # Create SDK directory
-          mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
-          cd $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
-          
-          # Download Command Line Tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          mv cmdline-tools latest
-          
-          # Set environment variables
-          export ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          
-          # CRITICAL FIX: Create symlink so Buildozer finds sdkmanager in the old path
-          mkdir -p $ANDROID_SDK_ROOT/tools/bin
-          ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager $ANDROID_SDK_ROOT/tools/bin/sdkmanager
-          
-          # Accept all licenses (automatically)
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1
-          
-          # Install build-tools (compatible with android.api=33) and platform-tools
-          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platform-tools" "platforms;android-33"
-
-      - name: Clean old build
-        run: |
-          rm -rf .buildozer bin
-
-      - name: Build APK
-        run: |
-          export ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          buildozer -v android debug
+          command: buildozer android debug
+          workdir: .
+          buildozer_version: master
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
