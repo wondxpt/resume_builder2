@@ -1,46 +1,86 @@
-name: Build Android APK
+[app]
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch: {}
+# (str) Title of your application
+title = Resume Builder
 
-jobs:
-  build:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v4
+# (str) Package name
+package.name = resumebuilder
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+# (str) Package domain
+package.domain = com.wondxpt
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
 
-      - name: Install system build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            autoconf automake libtool libtool-bin pkg-config \
-            build-essential git zip unzip openjdk-17-jdk \
-            libffi-dev libssl-dev zlib1g-dev \
-            libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
-            libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev
+# (str) Source code directory
+source.dir = .
 
-      - name: Install Buildozer and Cython
-        run: pip install --upgrade "buildozer==1.5.0" cython
+# (list) Source files to include
+source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf,json
 
-      - name: Build the APK
-        run: yes | buildozer -v android debug
 
-      - name: Upload the built APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: resume-builder-apk
-          path: bin/*.apk
+# (str) Application version
+version = 1.0
+
+
+# (list) Application requirements
+requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow==10.4.0,plyer
+
+
+# (str) Supported orientation
+orientation = portrait
+
+
+# (bool) Display fullscreen
+fullscreen = 0
+
+
+
+[buildozer]
+
+
+# (int) Log level
+log_level = 2
+
+
+# (str) Warn if running as root
+warn_on_root = 1
+
+
+
+[android]
+
+
+# (bool) Enable Android app
+enable_android = True
+
+
+# (str) Android API version
+android.api = 31
+
+
+# (str) Minimum Android API
+android.minapi = 21
+
+
+# (str) Android NDK version
+android.ndk = 25b
+
+
+# (str) Android SDK path
+# automatically detected by GitHub Actions
+
+
+# (list) Architectures
+android.archs = arm64-v8a, armeabi-v7a
+
+
+# (bool) Accept SDK licenses
+android.accept_sdk_license = True
+
+
+# (str) Android permissions
+android.permissions = INTERNET
+
+
+
+# (bool) Use androidx
+android.enable_androidx = True
