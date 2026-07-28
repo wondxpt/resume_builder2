@@ -28,9 +28,6 @@ android.enable_androidx = True
 android.permissions = INTERNET
 android.accept_sdk_license = True
 
-# Optional: explicitly set SDK path to avoid any mismatch
-# android.sdk_path = /home/runner/.buildozer/android/platform/android-sdk
-
 [buildozer]
 log_level = 2
 warn_on_root = 1
