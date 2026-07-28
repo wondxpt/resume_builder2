@@ -1,5 +1,6 @@
 import os
-os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
+
+os.environ["KIVY_GL_BACKEND"] = "angle_sdl2"
 
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, SlideTransition
@@ -30,12 +31,19 @@ OUTPUT_DIR = os.path.join(os.path.expanduser("~"), "Documents")
 
 LANGUAGE_OPTIONS = ["English", "French", "German", "Spanish", "Persian", "Other"]
 LEVEL_OPTIONS = [
-    "Native", "Fluent", "C2 - Proficient", "C1 - Advanced",
-    "B2 - Upper Intermediate", "B1 - Intermediate", "A2 - Elementary", "A1 - Beginner",
+    "Native",
+    "Fluent",
+    "C2 - Proficient",
+    "C1 - Advanced",
+    "B2 - Upper Intermediate",
+    "B1 - Intermediate",
+    "A2 - Elementary",
+    "A1 - Beginner",
 ]
 
 
 # ---------- helpers ----------
+
 
 def make_field(hint_text, multiline=False):
     return MDTextField(
@@ -55,8 +63,8 @@ def make_help_text(text):
         halign="left",
     )
     label.bind(
-        width=lambda inst, w: setattr(label, 'text_size', (w, None)),
-        texture_size=lambda inst, ts: setattr(label, 'height', ts[1] + 8),
+        width=lambda inst, w: setattr(label, "text_size", (w, None)),
+        texture_size=lambda inst, ts: setattr(label, "height", ts[1] + 8),
     )
     return label
 
@@ -79,18 +87,18 @@ def color_swatch(hex_color, height=8):
 def make_scroll_form():
     scroll = ScrollView(size_hint=(1, 1))
     form = MDBoxLayout(
-        orientation='vertical',
+        orientation="vertical",
         spacing=14,
         padding=(24, 20, 24, 20),
         size_hint_y=None,
     )
-    form.bind(minimum_height=form.setter('height'))
+    form.bind(minimum_height=form.setter("height"))
     scroll.add_widget(form)
     return scroll, form
 
 
 def nav_row(back_action=None, next_text="Next", next_action=None):
-    row = MDBoxLayout(orientation='horizontal', spacing=12, size_hint_y=None, height=50)
+    row = MDBoxLayout(orientation="horizontal", spacing=12, size_hint_y=None, height=50)
     if back_action:
         back_btn = MDFlatButton(text="Back")
         back_btn.bind(on_press=back_action)
@@ -104,21 +112,34 @@ def nav_row(back_action=None, next_text="Next", next_action=None):
 
 # ---------- screens ----------
 
+
 def build_template_screen(app):
     screen = MDScreen(name="template")
     scroll, form = make_scroll_form()
 
-    form.add_widget(MDLabel(text="Choose a Resume Template", font_style="H5",
-                             size_hint_y=None, height=44, bold=True))
-    form.add_widget(make_help_text(
-        "Pick a template. Simple single-column templates are safer for US/Canada ATS; "
-        "the graphic template with a photo is better suited for markets like Europe or "
-        "for a portfolio/LinkedIn profile. You can change this later."
-    ))
+    form.add_widget(
+        MDLabel(
+            text="Choose a Resume Template",
+            font_style="H5",
+            size_hint_y=None,
+            height=44,
+            bold=True,
+        )
+    )
+    form.add_widget(
+        make_help_text(
+            "Pick a template. Simple single-column templates are safer for US/Canada ATS; "
+            "the graphic template with a photo is better suited for markets like Europe or "
+            "for a portfolio/LinkedIn profile. You can change this later."
+        )
+    )
 
     selected_label = MDLabel(
         text=f"Selected: {TEMPLATES[app.data.selected_template]['label']}",
-        size_hint_y=None, height=30, theme_text_color="Primary", bold=True
+        size_hint_y=None,
+        height=30,
+        theme_text_color="Primary",
+        bold=True,
     )
     form.add_widget(selected_label)
 
@@ -126,13 +147,17 @@ def build_template_screen(app):
         def handler(instance):
             app.data.selected_template = key
             selected_label.text = f"Selected: {TEMPLATES[key]['label']}"
+
         return handler
+
     for key, cfg in TEMPLATES.items():
         card = MDBoxLayout(
-            orientation='vertical', spacing=6,
-            size_hint_y=None, padding=(12, 10, 12, 10),
+            orientation="vertical",
+            spacing=6,
+            size_hint_y=None,
+            padding=(12, 10, 12, 10),
         )
-        card.bind(minimum_height=card.setter('height'))
+        card.bind(minimum_height=card.setter("height"))
 
         preview_img = KivyImage(
             source=get_preview_path(key),
@@ -142,11 +167,14 @@ def build_template_screen(app):
             keep_ratio=True,
         )
         card.add_widget(preview_img)
-        card.add_widget(MDLabel(text=cfg["label"], bold=True,
-                                 size_hint_y=None, height=26))
+        card.add_widget(
+            MDLabel(text=cfg["label"], bold=True, size_hint_y=None, height=26)
+        )
         card.add_widget(make_help_text(cfg["description"]))
 
-        choose_btn = MDRaisedButton(text=f"Use {cfg['label']}", size_hint_y=None, height=44)
+        choose_btn = MDRaisedButton(
+            text=f"Use {cfg['label']}", size_hint_y=None, height=44
+        )
         choose_btn.bind(on_press=select_template(key))
         card.add_widget(choose_btn)
 
@@ -170,13 +198,22 @@ def build_photo_screen(app):
     screen = MDScreen(name="photo")
     scroll, form = make_scroll_form()
 
-    form.add_widget(MDLabel(text="Add Your Photo", font_style="H5",
-                             size_hint_y=None, height=40, bold=True))
-    form.add_widget(make_help_text(
-        "This template is graphic and works best with a profile photo. Choose a photo and "
-        "it will be automatically cropped into a circle. If you don't want to add a photo, "
-        "you can skip this step."
-    ))
+    form.add_widget(
+        MDLabel(
+            text="Add Your Photo",
+            font_style="H5",
+            size_hint_y=None,
+            height=40,
+            bold=True,
+        )
+    )
+    form.add_widget(
+        make_help_text(
+            "This template is graphic and works best with a profile photo. Choose a photo and "
+            "it will be automatically cropped into a circle. If you don't want to add a photo, "
+            "you can skip this step."
+        )
+    )
 
     preview = KivyImage(size_hint_y=None, height=160)
     if app.data.photo_path:
@@ -185,7 +222,9 @@ def build_photo_screen(app):
 
     path_label = MDLabel(
         text=app.data.photo_path or "No photo selected",
-        size_hint_y=None, height=28, theme_text_color="Secondary",
+        size_hint_y=None,
+        height=28,
+        theme_text_color="Secondary",
     )
     form.add_widget(path_label)
 
@@ -232,12 +271,21 @@ def build_personal_screen(app):
     screen = MDScreen(name="personal")
     scroll, form = make_scroll_form()
 
-    form.add_widget(MDLabel(text="Personal Information", font_style="H5",
-                             size_hint_y=None, height=40, bold=True))
-    form.add_widget(make_help_text(
-        "Enter your basic information. Target Job Title means the role you're applying for, "
-        "e.g. 'Hairstylist' or 'Python Developer'."
-    ))
+    form.add_widget(
+        MDLabel(
+            text="Personal Information",
+            font_style="H5",
+            size_hint_y=None,
+            height=40,
+            bold=True,
+        )
+    )
+    form.add_widget(
+        make_help_text(
+            "Enter your basic information. Target Job Title means the role you're applying for, "
+            "e.g. 'Hairstylist' or 'Python Developer'."
+        )
+    )
     f_name = make_field("Full Name")
     f_title = make_field("Target Job Title (e.g. Python Developer)")
     f_location = make_field("City, Province (e.g. Toronto, ON)")
@@ -283,21 +331,31 @@ def build_experience_screen(app):
     screen = MDScreen(name="experience")
     scroll, form = make_scroll_form()
 
-    form.add_widget(MDLabel(text="Work Experience", font_style="H5",
-                             size_hint_y=None, height=40, bold=True))
-    form.add_widget(make_help_text(
-        "Fill in each job separately. After each one, make sure to tap \"+ Add This Job\", "
-        "otherwise it won't be saved. For achievements, write one sentence per line. "
-        "If you have no work experience, just move to the next screen without filling this in. "
-        "You can edit or delete any entry below at any time."
-    ))
+    form.add_widget(
+        MDLabel(
+            text="Work Experience",
+            font_style="H5",
+            size_hint_y=None,
+            height=40,
+            bold=True,
+        )
+    )
+    form.add_widget(
+        make_help_text(
+            'Fill in each job separately. After each one, make sure to tap "+ Add This Job", '
+            "otherwise it won't be saved. For achievements, write one sentence per line. "
+            "If you have no work experience, just move to the next screen without filling this in. "
+            "You can edit or delete any entry below at any time."
+        )
+    )
 
-    count_label = MDLabel(text=f"{len(app.data.experience)} entries added",
-                           size_hint_y=None, height=28)
+    count_label = MDLabel(
+        text=f"{len(app.data.experience)} entries added", size_hint_y=None, height=28
+    )
     form.add_widget(count_label)
 
-    entry_list = MDBoxLayout(orientation='vertical', spacing=6, size_hint_y=None)
-    entry_list.bind(minimum_height=entry_list.setter('height'))
+    entry_list = MDBoxLayout(orientation="vertical", spacing=6, size_hint_y=None)
+    entry_list.bind(minimum_height=entry_list.setter("height"))
     form.add_widget(entry_list)
 
     f_job_title = make_field("Job Title")
@@ -319,7 +377,9 @@ def build_experience_screen(app):
     def refresh_entry_list():
         entry_list.clear_widgets()
         for i, job in enumerate(app.data.experience):
-            row = MDBoxLayout(orientation='horizontal', spacing=8, size_hint_y=None, height=40)
+            row = MDBoxLayout(
+                orientation="horizontal", spacing=8, size_hint_y=None, height=40
+            )
             label_text = f"{job.get('title', '')} — {job.get('company', '')}"
             row.add_widget(MDLabel(text=label_text, shorten=True, shorten_from="right"))
 
@@ -333,6 +393,7 @@ def build_experience_screen(app):
 
             entry_list.add_widget(row)
         count_label.text = f"{len(app.data.experience)} entries added"
+
     def start_edit(index):
         job = app.data.experience[index]
         f_job_title.text = job.get("title", "")
@@ -365,15 +426,21 @@ def build_experience_screen(app):
         if editing_index["value"] is not None:
             app.data.update_experience(
                 editing_index["value"],
-                f_job_title.text.strip(), f_company.text.strip(),
-                f_job_location.text.strip(), f_start.text.strip(),
-                f_end.text.strip(), f_bullets.text.strip()
+                f_job_title.text.strip(),
+                f_company.text.strip(),
+                f_job_location.text.strip(),
+                f_start.text.strip(),
+                f_end.text.strip(),
+                f_bullets.text.strip(),
             )
         else:
             app.data.add_experience(
-                f_job_title.text.strip(), f_company.text.strip(),
-                f_job_location.text.strip(), f_start.text.strip(),
-                f_end.text.strip(), f_bullets.text.strip()
+                f_job_title.text.strip(),
+                f_company.text.strip(),
+                f_job_location.text.strip(),
+                f_start.text.strip(),
+                f_end.text.strip(),
+                f_bullets.text.strip(),
             )
         cancel_edit(None)
         refresh_entry_list()
@@ -382,7 +449,9 @@ def build_experience_screen(app):
     add_btn.bind(on_press=add_or_update_entry)
     form.add_widget(add_btn)
 
-    cancel_btn = MDFlatButton(text="Cancel Edit", size_hint_y=None, height=40, opacity=0, disabled=True)
+    cancel_btn = MDFlatButton(
+        text="Cancel Edit", size_hint_y=None, height=40, opacity=0, disabled=True
+    )
     cancel_btn.bind(on_press=cancel_edit)
     form.add_widget(cancel_btn)
 
@@ -403,19 +472,25 @@ def build_education_screen(app):
     screen = MDScreen(name="education")
     scroll, form = make_scroll_form()
 
-    form.add_widget(MDLabel(text="Education", font_style="H5",
-                             size_hint_y=None, height=40, bold=True))
-    form.add_widget(make_help_text(
-        "Enter your degree or certificate and make sure to tap \"+ Add This Education\" to save it. "
-        "You can add multiple entries, and edit or delete any of them below at any time."
-    ))
+    form.add_widget(
+        MDLabel(
+            text="Education", font_style="H5", size_hint_y=None, height=40, bold=True
+        )
+    )
+    form.add_widget(
+        make_help_text(
+            'Enter your degree or certificate and make sure to tap "+ Add This Education" to save it. '
+            "You can add multiple entries, and edit or delete any of them below at any time."
+        )
+    )
 
-    count_label = MDLabel(text=f"{len(app.data.education)} entries added",
-                           size_hint_y=None, height=28)
+    count_label = MDLabel(
+        text=f"{len(app.data.education)} entries added", size_hint_y=None, height=28
+    )
     form.add_widget(count_label)
 
-    entry_list = MDBoxLayout(orientation='vertical', spacing=6, size_hint_y=None)
-    entry_list.bind(minimum_height=entry_list.setter('height'))
+    entry_list = MDBoxLayout(orientation="vertical", spacing=6, size_hint_y=None)
+    entry_list.bind(minimum_height=entry_list.setter("height"))
     form.add_widget(entry_list)
 
     f_degree = make_field("Degree / Certificate")
@@ -435,7 +510,9 @@ def build_education_screen(app):
     def refresh_entry_list():
         entry_list.clear_widgets()
         for i, edu in enumerate(app.data.education):
-            row = MDBoxLayout(orientation='horizontal', spacing=8, size_hint_y=None, height=40)
+            row = MDBoxLayout(
+                orientation="horizontal", spacing=8, size_hint_y=None, height=40
+            )
             label_text = f"{edu.get('degree', '')} — {edu.get('institution', '')}"
             row.add_widget(MDLabel(text=label_text, shorten=True, shorten_from="right"))
             edit_btn = MDFlatButton(text="Edit", size_hint_x=None, width=60)
@@ -479,13 +556,17 @@ def build_education_screen(app):
         if editing_index["value"] is not None:
             app.data.update_education(
                 editing_index["value"],
-                f_degree.text.strip(), f_institution.text.strip(),
-                f_edu_location.text.strip(), f_grad.text.strip()
+                f_degree.text.strip(),
+                f_institution.text.strip(),
+                f_edu_location.text.strip(),
+                f_grad.text.strip(),
             )
         else:
             app.data.add_education(
-                f_degree.text.strip(), f_institution.text.strip(),
-                f_edu_location.text.strip(), f_grad.text.strip()
+                f_degree.text.strip(),
+                f_institution.text.strip(),
+                f_edu_location.text.strip(),
+                f_grad.text.strip(),
             )
         cancel_edit(None)
         refresh_entry_list()
@@ -494,7 +575,9 @@ def build_education_screen(app):
     add_btn.bind(on_press=add_or_update_entry)
     form.add_widget(add_btn)
 
-    cancel_btn = MDFlatButton(text="Cancel Edit", size_hint_y=None, height=40, opacity=0, disabled=True)
+    cancel_btn = MDFlatButton(
+        text="Cancel Edit", size_hint_y=None, height=40, opacity=0, disabled=True
+    )
     cancel_btn.bind(on_press=cancel_edit)
     form.add_widget(cancel_btn)
 
@@ -515,33 +598,48 @@ def build_skills_screen(app):
     screen = MDScreen(name="skills")
     scroll, form = make_scroll_form()
 
-    form.add_widget(MDLabel(text="Skills & Languages", font_style="H5",
-                             size_hint_y=None, height=40, bold=True))
-    form.add_widget(make_help_text(
-        "Separate skills with commas. For languages, pick the language and then the "
-        "proficiency level from the menus, then tap \"+ Add Language\"."
-    ))
+    form.add_widget(
+        MDLabel(
+            text="Skills & Languages",
+            font_style="H5",
+            size_hint_y=None,
+            height=40,
+            bold=True,
+        )
+    )
+    form.add_widget(
+        make_help_text(
+            "Separate skills with commas. For languages, pick the language and then the "
+            'proficiency level from the menus, then tap "+ Add Language".'
+        )
+    )
 
     f_skills = make_field("Skills, separated by commas", multiline=True)
     f_skills.text = ", ".join(app.data.skills)
     form.add_widget(f_skills)
 
-    selected_language = MDRaisedButton(text="Select Language", size_hint_y=None, height=48)
+    selected_language = MDRaisedButton(
+        text="Select Language", size_hint_y=None, height=48
+    )
     selected_level = MDRaisedButton(text="Select Level", size_hint_y=None, height=48)
     form.add_widget(selected_language)
     form.add_widget(selected_level)
 
-    language_list = MDBoxLayout(orientation='vertical', spacing=4, size_hint_y=None)
-    language_list.bind(minimum_height=language_list.setter('height'))
+    language_list = MDBoxLayout(orientation="vertical", spacing=4, size_hint_y=None)
+    language_list.bind(minimum_height=language_list.setter("height"))
     form.add_widget(language_list)
 
     def refresh_language_list():
         language_list.clear_widgets()
         if not app.data.languages:
-            language_list.add_widget(MDLabel(text="No languages added", size_hint_y=None, height=28))
+            language_list.add_widget(
+                MDLabel(text="No languages added", size_hint_y=None, height=28)
+            )
             return
         for i, l in enumerate(app.data.languages):
-            row = MDBoxLayout(orientation='horizontal', spacing=8, size_hint_y=None, height=36)
+            row = MDBoxLayout(
+                orientation="horizontal", spacing=8, size_hint_y=None, height=36
+            )
             row.add_widget(MDLabel(text=f"{l['name']} - {l['level']}"))
             delete_btn = MDFlatButton(text="Delete", size_hint_x=None, width=70)
             delete_btn.bind(on_press=lambda inst, idx=i: delete_language(idx))
@@ -564,15 +662,27 @@ def build_skills_screen(app):
 
     language_menu = MDDropdownMenu(
         caller=selected_language,
-        items=[{"text": lang, "viewclass": "OneLineListItem",
-                "on_release": lambda x=lang: set_language(x)} for lang in LANGUAGE_OPTIONS],
+        items=[
+            {
+                "text": lang,
+                "viewclass": "OneLineListItem",
+                "on_release": lambda x=lang: set_language(x),
+            }
+            for lang in LANGUAGE_OPTIONS
+        ],
         width_mult=4,
     )
 
     level_menu = MDDropdownMenu(
         caller=selected_level,
-        items=[{"text": lvl, "viewclass": "OneLineListItem",
-                "on_release": lambda x=lvl: set_level(x)} for lvl in LEVEL_OPTIONS],
+        items=[
+            {
+                "text": lvl,
+                "viewclass": "OneLineListItem",
+                "on_release": lambda x=lvl: set_level(x),
+            }
+            for lvl in LEVEL_OPTIONS
+        ],
         width_mult=5,
     )
 
@@ -582,8 +692,10 @@ def build_skills_screen(app):
     def add_language(instance):
         if selected_language.text in ("Select Language", ""):
             return
-        app.data.add_language(selected_language.text, selected_level.text
-                               if selected_level.text != "Select Level" else "")
+        app.data.add_language(
+            selected_language.text,
+            selected_level.text if selected_level.text != "Select Level" else "",
+        )
         refresh_language_list()
         selected_language.text = "Select Language"
         selected_level.text = "Select Level"
@@ -599,7 +711,9 @@ def build_skills_screen(app):
         app.data.set_skills(f_skills.text.strip())
         app.sm.current = "preview"
 
-    form.add_widget(nav_row(back_action=go_back, next_text="Review & Generate", next_action=go_next))
+    form.add_widget(
+        nav_row(back_action=go_back, next_text="Review & Generate", next_action=go_next)
+    )
     screen.add_widget(scroll)
     return screen
 
@@ -608,14 +722,25 @@ def build_preview_screen(app):
     screen = MDScreen(name="preview")
     scroll, form = make_scroll_form()
 
-    form.add_widget(MDLabel(text="Review & Generate", font_style="H5",
-                             size_hint_y=None, height=40, bold=True))
-    form.add_widget(make_help_text(
-        "Check this summary before generating the PDF. If the Experience or Education count "
-        "is zero, you probably forgot to tap the Add button — go back and fix it."
-    ))
+    form.add_widget(
+        MDLabel(
+            text="Review & Generate",
+            font_style="H5",
+            size_hint_y=None,
+            height=40,
+            bold=True,
+        )
+    )
+    form.add_widget(
+        make_help_text(
+            "Check this summary before generating the PDF. If the Experience or Education count "
+            "is zero, you probably forgot to tap the Add button — go back and fix it."
+        )
+    )
 
-    preview_caption = MDLabel(text="", size_hint_y=None, height=22, theme_text_color="Secondary")
+    preview_caption = MDLabel(
+        text="", size_hint_y=None, height=22, theme_text_color="Secondary"
+    )
     form.add_widget(preview_caption)
     template_preview_img = KivyImage(
         source=get_preview_path(app.data.selected_template),
@@ -633,7 +758,7 @@ def build_preview_screen(app):
             keep_ratio=True,
         )
         close_btn = MDFlatButton(text="Close", size_hint_y=None, height=48)
-        popup_box = MDBoxLayout(orientation='vertical', spacing=8, padding=8)
+        popup_box = MDBoxLayout(orientation="vertical", spacing=8, padding=8)
         popup_box.add_widget(popup_image)
         popup_box.add_widget(close_btn)
 
@@ -648,7 +773,9 @@ def build_preview_screen(app):
     fullscreen_btn = MDFlatButton(text="View Full Screen", size_hint_y=None, height=44)
     fullscreen_btn.bind(on_press=open_fullscreen_preview)
     form.add_widget(fullscreen_btn)
-    change_template_btn = MDRaisedButton(text="Change Template", size_hint_y=None, height=48)
+    change_template_btn = MDRaisedButton(
+        text="Change Template", size_hint_y=None, height=48
+    )
     form.add_widget(change_template_btn)
 
     def pick_template(key):
@@ -656,12 +783,19 @@ def build_preview_screen(app):
             app.data.selected_template = key
             template_menu.dismiss()
             refresh_summary()
+
         return handler
 
     template_menu = MDDropdownMenu(
         caller=change_template_btn,
-        items=[{"text": cfg["label"], "viewclass": "OneLineListItem",
-                "on_release": pick_template(key)} for key, cfg in TEMPLATES.items()],
+        items=[
+            {
+                "text": cfg["label"],
+                "viewclass": "OneLineListItem",
+                "on_release": pick_template(key),
+            }
+            for key, cfg in TEMPLATES.items()
+        ],
         width_mult=5,
     )
     change_template_btn.bind(on_release=lambda x: template_menu.open())
@@ -670,7 +804,9 @@ def build_preview_screen(app):
     form.add_widget(template_label)
 
     summary_label = MDLabel(text="", size_hint_y=None, halign="left")
-    summary_label.bind(texture_size=lambda inst, val: setattr(summary_label, 'height', val[1]))
+    summary_label.bind(
+        texture_size=lambda inst, val: setattr(summary_label, "height", val[1])
+    )
     form.add_widget(summary_label)
 
     status_label = MDLabel(text="", size_hint_y=None, height=40)
@@ -684,7 +820,9 @@ def build_preview_screen(app):
         live_png = None
         if d.full_name and d.email:
             # Render the actual PDF (same template, same styling) and show it.
-            live_png = build_live_preview(d.to_dict(), generate_resume_pdf, template=d.selected_template)
+            live_png = build_live_preview(
+                d.to_dict(), generate_resume_pdf, template=d.selected_template
+            )
 
         missing = []
         if not d.full_name:
@@ -699,7 +837,9 @@ def build_preview_screen(app):
             template_preview_img.source = live_png
         elif missing:
             preview_caption.text = (
-                "Fill in " + ", ".join(missing) + " (on the Personal Information screen) "
+                "Fill in "
+                + ", ".join(missing)
+                + " (on the Personal Information screen) "
                 "to see your actual resume here."
             )
             template_preview_img.source = get_preview_path(d.selected_template)
@@ -710,9 +850,13 @@ def build_preview_screen(app):
 
         warnings = []
         if len(d.experience) == 0:
-            warnings.append("⚠ No work experience added — did you forget to tap \"+ Add This Job\"?")
+            warnings.append(
+                '⚠ No work experience added — did you forget to tap "+ Add This Job"?'
+            )
         if len(d.education) == 0:
-            warnings.append("⚠ No education added — did you forget to tap \"+ Add This Education\"?")
+            warnings.append(
+                '⚠ No education added — did you forget to tap "+ Add This Education"?'
+            )
         if d.selected_template == "creative_photo" and not d.photo_path:
             warnings.append("⚠ This template is designed for a photo — none was added.")
         summary_label.text = "\n".join(warnings)
