@@ -53,7 +53,6 @@ android.enable_androidx = True
 # Increase if the build fails with an accept-licenses prompt.
 android.accept_sdk_license = True
 
-p4a.branch = master
 
 [buildozer]
 log_level = 2
