@@ -1,43 +1,84 @@
-[app]
+name: Build Resume Builder APK
 
-title = Resume Builder
-package.name = resumebuilder
-package.domain = com.wondxpt
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
-source.dir = .
-source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf
+jobs:
+  build-apk:
+    runs-on: ubuntu-22.04
 
-version = 1.0
+    steps:
 
-requirements = python3==3.11.15,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow,plyer,android
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-orientation = portrait
-fullscreen = 0
+      - name: Setup Python 3.11.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.7'
 
-icon.filename = %(source.dir)s/icon.png
-presplash.filename = %(source.dir)s/presplash.png
+      - name: Verify Python version
+        run: |
+          python --version
+          python -c "import sys; print(sys.version)"
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
 
-[android]
+          sudo apt-get install -y \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            autoconf \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev \
+            libtinfo5 \
+            cmake \
+            libffi-dev \
+            libssl-dev \
+            automake
 
-android.api = 35
-android.minapi = 24
-android.ndk = 28c
+      - name: Verify Java
+        run: |
+          java -version
+          javac -version
 
-p4a.branch = 2024.01.21
+      - name: Install Buildozer
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            buildozer==1.5.0 \
+            Cython==0.29.34 \
+            virtualenv
 
-android.archs = arm64-v8a,armeabi-v7a
+      - name: Verify Buildozer
+        run: |
+          buildozer --version
 
-android.permissions = READ_MEDIA_IMAGES,READ_EXTERNAL_STORAGE
+      - name: Clean old build
+        run: |
+          rm -rf .buildozer
+          rm -rf bin
 
-android.presplash_color = #FFFFFF
+      - name: Build APK
+        run: |
+          buildozer -v android debug
 
-android.enable_androidx = True
+      - name: Verify APK
+        run: |
+          ls -lah bin/
+          file bin/*.apk
 
-android.accept_sdk_license = True
-
-
-[buildozer]
-
-log_level = 2
-warn_on_root = 1
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Resume-Builder-APK
+          path: bin/*.apk
