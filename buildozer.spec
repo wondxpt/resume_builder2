@@ -1,84 +1,86 @@
-name: Build Resume Builder APK
+[app]
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+# (str) Title of your application
+title = Resume Builder
 
-jobs:
-  build-apk:
-    runs-on: ubuntu-22.04
+# (str) Package name
+package.name = resumebuilder
 
-    steps:
+# (str) Package domain
+package.domain = com.wondxpt
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+# (str) Source code where main.py is located
+source.dir = .
 
-      - name: Setup Python 3.11.7
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11.7'
+# (str) Application version
+version = 1.0.0
 
-      - name: Verify Python version
-        run: |
-          python --version
-          python -c "import sys; print(sys.version)"
+# (str) Application requirements
+requirements = python3==3.11.7,kivy==2.3.0,kivymd==1.2.0,reportlab==4.0.9,pillow,plyer,android
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
+# (str) Supported file extensions
+source.include_exts = py,png,jpg,jpeg,kv,json,ttf,otf
 
-          sudo apt-get install -y \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk \
-            autoconf \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libtinfo5 \
-            cmake \
-            libffi-dev \
-            libssl-dev \
-            automake
+# (str) Files/folders to exclude
+source.exclude_exts = spec
 
-      - name: Verify Java
-        run: |
-          java -version
-          javac -version
+# (str) Application orientation
+orientation = portrait
 
-      - name: Install Buildozer
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install \
-            buildozer==1.5.0 \
-            Cython==0.29.34 \
-            virtualenv
+# (bool) Fullscreen
+fullscreen = 0
 
-      - name: Verify Buildozer
-        run: |
-          buildozer --version
+# (str) Application icon
+icon.filename = %(source.dir)s/icon.png
 
-      - name: Clean old build
-        run: |
-          rm -rf .buildozer
-          rm -rf bin
 
-      - name: Build APK
-        run: |
-          buildozer -v android debug
+# ------------------------------------------------------------------
+# Android
+# ------------------------------------------------------------------
 
-      - name: Verify APK
-        run: |
-          ls -lah bin/
-          file bin/*.apk
+# Android API
+android.api = 34
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Resume-Builder-APK
-          path: bin/*.apk
+# Minimum Android API
+android.minapi = 24
+
+# Android NDK
+android.ndk = 25b
+
+# Android architectures
+android.archs = arm64-v8a,armeabi-v7a
+
+# Debug build output
+android.debug_artifact = apk
+
+# Release build output
+android.release_artifact = aab
+
+# Android permissions
+android.permissions = INTERNET
+
+# AndroidX
+android.enable_androidx = True
+
+# Copy native libraries
+android.copy_libs = 1
+
+
+# ------------------------------------------------------------------
+# python-for-android
+# ------------------------------------------------------------------
+
+# Use official Kivy python-for-android fork
+p4a.fork = kivy
+
+# IMPORTANT:
+# Do NOT use "develop"
+p4a.branch = v2024.01.21
+
+
+# ------------------------------------------------------------------
+# Build
+# ------------------------------------------------------------------
+
+log_level = 2
+warn_on_root = 1
