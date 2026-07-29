@@ -7,10 +7,18 @@ package.domain = com.wondxpt
 source.dir = .
 version = 1.0.0
 
-requirements = python3==3.11.7,kivy==2.3.0,kivymd==1.2.0,reportlab==4.0.9,pillow,plyer,android
+requirements = python3==3.11.7,kivy==2.3.0,kivymd==1.2.0,pillow,plyer,android,reportlab
 
-source.include_exts = py,png,jpg,jpeg,kv,json,ttf,otf
+source.include_exts = py,png,jpg,jpeg,kv,json,ttf,otf,txt
+
 source.exclude_exts = spec
+
+source.exclude_dirs = .git,.github,.buildozer,bin
+
+
+# --------------------------------------------------
+# Application
+# --------------------------------------------------
 
 orientation = portrait
 fullscreen = 0
@@ -34,22 +42,23 @@ android.permissions = INTERNET
 android.enable_androidx = True
 android.copy_libs = 1
 
+android.accept_sdk_license = True
+android.skip_update = False
+
 android.debug_artifact = apk
 android.release_artifact = aab
 
-# Automatically accept Android SDK licenses
-android.accept_sdk_license = True
-
-# Do not skip SDK updates
-android.skip_update = False
-
 
 # --------------------------------------------------
-# python-for-android
+# Python-for-Android
 # --------------------------------------------------
 
 p4a.fork = kivy
 p4a.branch = v2024.01.21
+
+# Use our local ReportLab recipe instead of the broken
+# built-in ReportLab recipe.
+p4a.local_recipes = %(source.dir)s/p4a-recipes
 
 
 # --------------------------------------------------
