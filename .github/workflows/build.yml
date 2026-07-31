@@ -9,26 +9,28 @@ on:
 
 
 jobs:
+
   build:
 
     runs-on: ubuntu-22.04
 
+
     steps:
 
 
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v4
 
 
 
-    - name: Setup Python
+    - name: Setup Python 3.11
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
 
 
 
-    - name: Setup Java
+    - name: Setup Java 17
       uses: actions/setup-java@v4
       with:
         distribution: temurin
@@ -36,27 +38,29 @@ jobs:
 
 
 
-    - name: Install dependencies
+    - name: Install Linux dependencies
       run: |
+
         sudo apt update
 
         sudo apt install -y \
-        autoconf \
-        automake \
-        libtool \
-        libtool-bin \
-        pkg-config \
-        build-essential \
-        git \
-        zip \
-        unzip \
-        libffi-dev \
-        libssl-dev \
-        zlib1g-dev \
-        libsdl2-dev \
-        libsdl2-image-dev \
-        libsdl2-mixer-dev \
-        libsdl2-ttf-dev
+          autoconf \
+          automake \
+          libtool \
+          libtool-bin \
+          pkg-config \
+          build-essential \
+          git \
+          zip \
+          unzip \
+          wget \
+          libffi-dev \
+          libssl-dev \
+          zlib1g-dev \
+          libsdl2-dev \
+          libsdl2-image-dev \
+          libsdl2-mixer-dev \
+          libsdl2-ttf-dev
 
 
 
@@ -77,34 +81,91 @@ jobs:
       uses: actions/cache@v4
 
       with:
+
         path: |
+
           ~/.buildozer
           .buildozer
+
 
         key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
         restore-keys: |
+
           buildozer-${{ runner.os }}-
 
 
 
-    - name: Prepare Android SDK licenses
+    - name: Install Android SDK manually
       run: |
 
-        mkdir -p ~/.buildozer/android/platform/android-sdk
+        mkdir -p $HOME/.buildozer/android/platform/android-sdk/tools/bin
 
-        yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
+
+        cd /tmp
+
+
+        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+
+
+        mkdir android-tools
+
+
+        unzip -q commandlinetools-linux-11076708_latest.zip -d android-tools
+
+
+        mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
+
+
+        mv android-tools/cmdline-tools/* \
+        $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/
+
+
+        ln -s \
+        $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+        $HOME/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+
+
+
+    - name: Install Android packages
+      run: |
+
+        export ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk
+
+        export PATH=$ANDROID_HOME/tools/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+
+
+        yes | sdkmanager --licenses || true
+
+
+        sdkmanager \
+        "platform-tools" \
+        "platforms;android-31" \
+        "build-tools;31.0.0"
+
+
+
+    - name: Set Android variables
+      run: |
+
+        echo "ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+
+        echo "ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r25b" >> $GITHUB_ENV
+
+        echo "ANDROIDAPI=31" >> $GITHUB_ENV
+
+        echo "ANDROIDMINAPI=24" >> $GITHUB_ENV
+
+
+
+    - name: Clean previous build
+      run: |
+
+        rm -rf .buildozer/android/platform/build-*
 
 
 
     - name: Build APK
-      env:
-
-        ANDROIDAPI: 31
-        ANDROIDMINAPI: 24
-        ANDROIDNDK: 28c
-
-
       run: |
 
         buildozer -v android debug
