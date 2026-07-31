@@ -15,12 +15,15 @@ version = 1.0.0
 orientation = portrait
 
 
-requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow,plyer,setuptools
+requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab==4.2.5,pillow==10.4.0,plyer,setuptools
 
 
 presplash.filename = %(source.dir)s/assets/presplash.png
 
 icon.filename = %(source.dir)s/assets/icon.png
+
+
+android.archs = arm64-v8a,armeabi-v7a
 
 
 
@@ -48,10 +51,8 @@ android.accept_sdk_license = True
 android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
 
 
-android.archs = arm64-v8a
+# جلوگیری از مشکلات دانلودهای قدیمی
+android.skip_update = False
 
 
-
-[python-for-android]
-
-android.hostpython3 = True
+p4a.branch = master
