@@ -51,8 +51,7 @@ jobs:
           unzip -q commandlinetools-linux-9477386_latest.zip
           rm commandlinetools-linux-9477386_latest.zip
           mkdir -p cmdline-tools/latest
-          mv tools/* cmdline-tools/latest/
-          rmdir tools
+          mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
 
       - name: Accept SDK licenses and install build-tools
         run: |
