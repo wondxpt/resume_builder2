@@ -14,20 +14,12 @@ version = 1.0.0
 
 requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab==4.2.5,pillow,plyer
 
-
 orientation = portrait
-
-
-icon.filename = assets/icon.png
-
-presplash.filename = assets/presplash.png
-
 
 
 [buildozer]
 
 log_level = 2
-
 
 
 [android]
@@ -36,12 +28,6 @@ android.api = 31
 
 android.minapi = 21
 
-android.ndk = 25b
-
 android.archs = arm64-v8a
 
-
 android.enable_androidx = True
-
-
-android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
