@@ -1,42 +1,27 @@
-name: Build Android APK
+name: Build Kivy APK
 
-on:
-  push:
-    branches:
-      - main
-
-  workflow_dispatch:
-
+on: 
+  push: # 代码推送时自动触发
+    branches: [ main ]
+  workflow_dispatch: # 允许从Actions标签页手动触发[reference:14]
 
 jobs:
-
-  build-android:
-
+  build:
     runs-on: ubuntu-latest
 
-
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Build APK with Buildozer
+      uses: ArtemSBulgakov/buildozer-action@v1 # 成功的核心[reference:15][reference:16]
+      id: buildozer
+      with:
+        command: buildozer android debug
+        buildozer_version: stable
 
-
-      - name: Build APK with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-
-        id: buildozer
-
-        with:
-          command: buildozer android debug
-          buildozer_version: stable
-
-
-      - name: Upload APK
-
-        uses: actions/upload-artifact@v4
-
-        with:
-
-          name: resume-builder-apk
-
-          path: ${{ steps.buildozer.outputs.filename }}
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: resume-builder-apk
+        path: ${{ steps.buildozer.outputs.filename }} # 自动定位生成的APK[reference:17]
