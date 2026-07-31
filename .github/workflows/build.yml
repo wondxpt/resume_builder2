@@ -1,78 +1,148 @@
-[app]
+name: Build Android APK
 
-title = Resume Builder
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
-package.name = resumebuilder
+jobs:
+  build:
 
-package.domain = com.wondxpt
+    runs-on: ubuntu-22.04
 
+    steps:
 
-source.dir = .
-
-
-source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf,json
-
-
-version = 1.0.0
-
-
-requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab==4.2.5,pillow==10.4.0,plyer,setuptools
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
 
-orientation = portrait
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
 
-presplash.filename = %(source.dir)s/assets/presplash.png
-
-icon.filename = %(source.dir)s/assets/icon.png
-
-
-
-[buildozer]
-
-log_level = 2
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
 
 
+      - name: Install system dependencies
+        run: |
 
-[android]
+          sudo apt update
 
-
-fullscreen = 0
-
-
-android.api = 31
-
-
-android.minapi = 24
-
-
-android.archs = arm64-v8a
-
-
-android.enable_androidx = True
-
-
-android.accept_sdk_license = True
-
-
-android.ndk = 28c
-
-
-
-android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
+          sudo apt install -y \
+          autoconf \
+          automake \
+          libtool \
+          libtool-bin \
+          pkg-config \
+          build-essential \
+          git \
+          zip \
+          unzip \
+          openjdk-17-jdk \
+          libffi-dev \
+          libssl-dev \
+          zlib1g-dev \
+          libsdl2-dev \
+          libsdl2-image-dev \
+          libsdl2-mixer-dev \
+          libsdl2-ttf-dev
 
 
+      - name: Install Buildozer
+        run: |
 
-# جلوگیری از دانلود نسخه‌های خراب
-android.skip_update = True
+          pip install --upgrade pip
 
+          pip install setuptools
 
+          pip install cython==0.29.36
 
-p4a.branch = 2024.01.21
+          pip install buildozer==1.5.0
 
 
 
-[python-for-android]
+      - name: Setup Android SDK
+
+        uses: android-actions/setup-android@v3
 
 
-android.hostpython3 = True
+
+      - name: Accept Android licenses
+
+        run: |
+
+          yes | sdkmanager --licenses
+
+
+
+      - name: Install Android packages
+
+        run: |
+
+          sdkmanager \
+          "platform-tools" \
+          "platforms;android-31" \
+          "build-tools;35.0.0"
+
+
+
+      - name: Set Android environment
+
+        run: |
+
+          echo "ANDROIDSDK=$ANDROID_HOME" >> $GITHUB_ENV
+
+          echo "ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r28c" >> $GITHUB_ENV
+
+          echo "ANDROIDAPI=31" >> $GITHUB_ENV
+
+          echo "ANDROIDMINAPI=24" >> $GITHUB_ENV
+
+
+
+      - name: Cache Buildozer
+
+        uses: actions/cache@v4
+
+        with:
+
+          path: |
+
+            ~/.buildozer
+
+            .buildozer
+
+          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+
+          restore-keys:
+
+            buildozer-${{ runner.os }}-
+
+
+
+      - name: Build APK
+
+        run: |
+
+          buildozer android clean
+
+          yes | buildozer -v android debug
+
+
+
+      - name: Upload APK
+
+        uses: actions/upload-artifact@v4
+
+        with:
+
+          name: resume-builder-apk
+
+          path: bin/*.apk
