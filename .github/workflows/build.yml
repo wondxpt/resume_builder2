@@ -38,6 +38,11 @@ jobs:
           pip install buildozer==1.5.0
           pip install setuptools
 
+      - name: Install build-tools manually
+        run: |
+          ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager "build-tools;37.0.0"
+        continue-on-error: true
+
       - name: Build with Buildozer
         run: buildozer -v android debug
 
