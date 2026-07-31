@@ -9,11 +9,9 @@ on:
 
 
 jobs:
-
   build:
 
     runs-on: ubuntu-22.04
-
 
     steps:
 
@@ -38,9 +36,8 @@ jobs:
 
 
 
-    - name: Install system packages
+    - name: Install dependencies
       run: |
-
         sudo apt update
 
         sudo apt install -y \
@@ -80,27 +77,23 @@ jobs:
       uses: actions/cache@v4
 
       with:
-
         path: |
-
           ~/.buildozer
           .buildozer
 
-
         key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
-        restore-keys:
-
+        restore-keys: |
           buildozer-${{ runner.os }}-
 
 
 
-    - name: Clean old broken build
+    - name: Prepare Android SDK licenses
       run: |
 
-        rm -rf .buildozer/android/platform/python-for-android
+        mkdir -p ~/.buildozer/android/platform/android-sdk
 
-        rm -rf ~/.buildozer/android/platform/python-for-android
+        yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
 
 
 
@@ -108,9 +101,7 @@ jobs:
       env:
 
         ANDROIDAPI: 31
-
         ANDROIDMINAPI: 24
-
         ANDROIDNDK: 28c
 
 
