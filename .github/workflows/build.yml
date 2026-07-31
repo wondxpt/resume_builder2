@@ -54,6 +54,9 @@ jobs:
           rm -rf ~/.buildozer
           rm -rf .buildozer
 
+      - name: Accept SDK licenses manually (just in case)
+        run: yes | sdkmanager --licenses || true
+
       - name: Build with Buildozer
         run: |
           export JAVA_HOME=$JAVA_HOME_17_X64
@@ -61,7 +64,7 @@ jobs:
           export ANDROIDNDK=/home/runner/.buildozer/android/platform/android-ndk-r28c
           export ANDROIDAPI=31
           export ANDROIDMINAPI=21
-          buildozer -v android debug
+          echo y | buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
