@@ -47,6 +47,11 @@ jobs:
             buildozer-global-${{ hashFiles('buildozer.spec') }}
             buildozer-global-
 
+      - name: Install Android SDK build-tools manually
+        run: |
+          ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --sdk_root=/home/runner/.buildozer/android/platform/android-sdk "build-tools;37.0.0"
+        continue-on-error: true
+
       - name: Build with Buildozer
         run: |
           buildozer -v android debug
