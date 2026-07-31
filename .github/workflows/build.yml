@@ -10,16 +10,15 @@ on:
 
 jobs:
 
-  build:
+  build-android:
 
     runs-on: ubuntu-latest
 
 
     steps:
 
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
 
 
       - name: Build APK with Buildozer
@@ -28,11 +27,8 @@ jobs:
         id: buildozer
 
         with:
-
           command: buildozer android debug
-
           buildozer_version: stable
-
 
 
       - name: Upload APK
