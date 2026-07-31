@@ -1,62 +1,35 @@
 [app]
 
-
 title = Resume Builder
-
 
 package.name = resumebuilder
 
-
 package.domain = com.wondxpt
-
 
 source.dir = .
 
-
 source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf,json
-
 
 version = 1.0.0
 
-
-requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab==4.2.5,pillow,plyer
-
+requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow,plyer
 
 orientation = portrait
-
-
-icon.filename = assets/icon.png
-
-
-presplash.filename = assets/presplash.png
-
-
-
-
-[buildozer]
-
-
-log_level = 2
-
-
-
-
-[android]
-
-
-android.api = 31
-
-
-android.minapi = 23
-
 
 android.archs = arm64-v8a
 
 
+[buildozer]
+
+log_level = 2
+
+
+[android]
+
+android.api = 31
+
+android.minapi = 24
+
 android.enable_androidx = True
 
-
-android.permissions = INTERNET
-
-
-p4a.branch = master
+android.accept_sdk_license = True
