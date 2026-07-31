@@ -18,6 +18,12 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-31 build-tools;37.0.0 platform-tools'
+          accept-android-sdk-licenses: true
+
       - name: Install system dependencies
         run: |
           sudo apt update
@@ -43,23 +49,9 @@ jobs:
           rm -rf ~/.buildozer
           rm -rf .buildozer
 
-      - name: Download and install Android SDK manually with license acceptance
-        run: |
-          mkdir -p ~/.buildozer/android/platform/android-sdk
-          cd ~/.buildozer/android/platform/android-sdk
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-6514223_latest.zip
-          unzip -q commandlinetools-linux-6514223_latest.zip
-          rm commandlinetools-linux-6514223_latest.zip
-          mkdir -p cmdline-tools/latest
-          mv tools/* cmdline-tools/latest/
-          rmdir tools
-          export PATH=$PATH:$PWD/cmdline-tools/latest/bin
-          echo "yes | sdkmanager --licenses --sdk_root=$PWD" | bash
-          sdkmanager --sdk_root=$PWD "platform-tools" "platforms;android-31" "build-tools;37.0.0"
-
       - name: Build with Buildozer
         run: |
-          export ANDROIDSDK=/home/runner/.buildozer/android/platform/android-sdk
+          export ANDROIDSDK=$ANDROID_HOME
           export ANDROIDNDK=/home/runner/.buildozer/android/platform/android-ndk-r28c
           export ANDROIDAPI=31
           export ANDROIDMINAPI=21
