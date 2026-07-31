@@ -13,12 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -34,7 +28,7 @@ jobs:
             zlib1g-dev libssl-dev \
             libffi-dev \
             libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
-            libstdc++6
+            openjdk-17-jdk
           sudo apt clean
 
       - name: Install Python packages
@@ -44,28 +38,8 @@ jobs:
           pip install buildozer==1.5.0
           pip install setuptools
 
-      - name: Set up Android SDK with licenses accepted
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'platforms;android-31 build-tools;37.0.0 platform-tools'
-          accept-android-sdk-licenses: true
-
-      - name: Clean broken cache
-        run: |
-          rm -rf ~/.buildozer
-          rm -rf .buildozer
-
-      - name: Accept SDK licenses manually (extra safety)
-        run: yes | sdkmanager --licenses || true
-
       - name: Build with Buildozer
-        run: |
-          export JAVA_HOME=$JAVA_HOME_17_X64
-          export ANDROIDSDK=$ANDROID_HOME
-          export ANDROIDNDK=/home/runner/.buildozer/android/platform/android-ndk-r28c
-          export ANDROIDAPI=31
-          export ANDROIDMINAPI=21
-          echo y | buildozer -v android debug
+        run: buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
