@@ -18,7 +18,7 @@ jobs:
     steps:
 
 
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
 
@@ -30,7 +30,7 @@ jobs:
 
 
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -38,34 +38,59 @@ jobs:
 
 
 
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
 
           sudo apt update
 
           sudo apt install -y \
-          build-essential \
-          git \
-          zip \
-          unzip \
-          autoconf \
-          automake \
-          libtool \
-          pkg-config \
-          libffi-dev \
-          libssl-dev \
-          zlib1g-dev \
-          openjdk-17-jdk \
-          wget
+            autoconf \
+            automake \
+            libtool \
+            libtool-bin \
+            pkg-config \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            wget \
+            libffi-dev \
+            libssl-dev \
+            zlib1g-dev \
+            openjdk-17-jdk
 
 
 
+      # پیدا کردن sdkmanager
+      - name: Setup Android SDK path
+        run: |
+
+          echo "Searching sdkmanager..."
+
+          SDKMANAGER=$(find $ANDROID_HOME -name sdkmanager -type f | head -1)
+
+          echo "SDKMANAGER=$SDKMANAGER"
+
+          if [ -z "$SDKMANAGER" ]; then
+            echo "sdkmanager not found"
+            exit 1
+          fi
+
+
+          echo "SDKMANAGER_PATH=$SDKMANAGER" >> $GITHUB_ENV
+
+          echo "$(dirname $SDKMANAGER)" >> $GITHUB_PATH
+
+
+
+      # نصب SDK
       - name: Install Android SDK packages
         run: |
 
-          yes | sdkmanager --licenses || true
+          yes | $SDKMANAGER_PATH --licenses || true
 
-          sdkmanager \
+
+          $SDKMANAGER_PATH \
           "platform-tools" \
           "platforms;android-31" \
           "build-tools;31.0.0"
@@ -91,7 +116,7 @@ jobs:
 
         with:
 
-          path:
+          path: |
 
             ~/.buildozer
 
@@ -105,24 +130,7 @@ jobs:
 
 
 
-      # جایگزینی دانلود خراب freetype
-
-      - name: Fix freetype download
-
-        run: |
-
-          mkdir -p ~/.buildozer/android/platform/packages/freetype
-
-
-          wget -O ~/.buildozer/android/platform/packages/freetype/freetype-2.14.1.tar.gz \
-          https://download-mirror.savannah.gnu.org/releases/freetype/freetype-2.14.1.tar.gz || true
-
-
-
-
-
       - name: Build APK
-
         run: |
 
           buildozer -v android debug
@@ -130,7 +138,6 @@ jobs:
 
 
       - name: Upload APK
-
         uses: actions/upload-artifact@v4
 
         with:
