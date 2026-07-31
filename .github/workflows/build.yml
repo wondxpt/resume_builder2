@@ -2,11 +2,14 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
+
 
 jobs:
   build:
+
     runs-on: ubuntu-22.04
 
     steps:
@@ -28,33 +31,34 @@ jobs:
           java-version: "17"
 
 
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
-          sudo apt update
+          sudo apt-get update
 
-          sudo apt install -y \
-          autoconf \
-          automake \
-          libtool \
-          libtool-bin \
-          pkg-config \
-          build-essential \
-          git \
-          zip \
-          unzip \
-          openjdk-17-jdk \
-          libffi-dev \
-          libssl-dev \
-          zlib1g-dev \
-          libsdl2-dev \
-          libsdl2-image-dev \
-          libsdl2-mixer-dev \
-          libsdl2-ttf-dev
+          sudo apt-get install -y \
+            autoconf \
+            automake \
+            libtool \
+            libtool-bin \
+            pkg-config \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            libffi-dev \
+            libssl-dev \
+            zlib1g-dev \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libportmidi-dev
 
 
-      - name: Install Buildozer
+      - name: Install Buildozer tools
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install setuptools
           pip install cython==0.29.36
           pip install buildozer==1.5.0
@@ -73,39 +77,20 @@ jobs:
             buildozer-${{ runner.os }}-
 
 
-      # مهم: حذف recipe خراب ReportLab
-      - name: Remove broken reportlab recipe
+      - name: Setup Android environment
         run: |
 
-          P4A=$(find ~/.buildozer -type d -name "python-for-android" | head -1)
-
-          echo "P4A PATH:"
-          echo $P4A
-
-          if [ -d "$P4A/pythonforandroid/recipes/reportlab" ]; then
-
-            rm -rf "$P4A/pythonforandroid/recipes/reportlab"
-
-            echo "Reportlab recipe removed"
-
-          else
-
-            echo "Reportlab recipe not found"
-
-          fi
+          echo "ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+          echo "ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r28c" >> $GITHUB_ENV
+          echo "ANDROIDAPI=31" >> $GITHUB_ENV
+          echo "ANDROIDMINAPI=24" >> $GITHUB_ENV
 
 
 
       - name: Build APK
-        env:
-          ANDROIDAPI: 31
-          ANDROIDMINAPI: 24
-          ANDROIDNDK: 28c
-
         run: |
 
-          yes | buildozer android debug -v
-
+          buildozer -v android debug
 
 
       - name: Upload APK
