@@ -1,5 +1,4 @@
 [app]
-
 source.dir = .
 title = Resume Builder
 package.name = resumebuilder
