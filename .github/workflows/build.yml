@@ -47,14 +47,10 @@ jobs:
     - name: Pre-cache packages (fix 502 & 404 errors)
       run: |
         mkdir -p ~/.buildozer/cache
-
-        # freetype - رفع خطای 502
         wget -O ~/.buildozer/cache/freetype-2.14.1.tar.gz \
           https://mirrors.kernel.org/gnu/freetype/freetype-2.14.1.tar.gz || \
         wget -O ~/.buildozer/cache/freetype-2.14.1.tar.gz \
           https://download.savannah.gnu.org/releases/freetype/freetype-2.14.1.tar.gz || true
-
-        # reportlab - رفع خطای 404
         wget -O ~/.buildozer/cache/reportlab-4.2.0.tar.gz \
           https://files.pythonhosted.org/packages/source/r/reportlab/reportlab-4.2.0.tar.gz || true
 
