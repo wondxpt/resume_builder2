@@ -5,7 +5,7 @@ package.name = resumebuilder
 package.domain = org.yourdomain
 version = 1.0.0
 
-requirements = python3==3.11.0,kivy==2.3.0,kivymd==2.0.0,pillow,plyer,setuptools
+requirements = python3==3.10.0,kivy==2.3.0,kivymd==2.0.0,pillow,plyer,setuptools
 
 orientation = portrait
 icon.filename = icon.png
@@ -15,7 +15,7 @@ android.api = 31
 android.minapi = 21
 android.ndk = 28c
 android.permissions = INTERNET
-p4a.branch = master
+p4a.branch = develop
 
 [buildozer]
 log_level = 2
