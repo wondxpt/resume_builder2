@@ -8,96 +8,113 @@ on:
 
 
 jobs:
+
   build:
 
     runs-on: ubuntu-22.04
 
+
     steps:
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-
-          sudo apt-get install -y \
-            autoconf \
-            automake \
-            libtool \
-            libtool-bin \
-            pkg-config \
-            build-essential \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk \
-            libffi-dev \
-            libssl-dev \
-            zlib1g-dev \
-            libsdl2-dev \
-            libsdl2-image-dev \
-            libsdl2-mixer-dev \
-            libsdl2-ttf-dev \
-            libportmidi-dev
-
-
-      - name: Install Buildozer tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools
-          pip install cython==0.29.36
-          pip install buildozer==1.5.0
-
-
-      - name: Cache Buildozer
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.buildozer
-            .buildozer
-
-          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
-
-          restore-keys: |
-            buildozer-${{ runner.os }}-
-
-
-      - name: Setup Android environment
-        run: |
-
-          echo "ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-          echo "ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r28c" >> $GITHUB_ENV
-          echo "ANDROIDAPI=31" >> $GITHUB_ENV
-          echo "ANDROIDMINAPI=24" >> $GITHUB_ENV
+    - name: Checkout
+      uses: actions/checkout@v4
 
 
 
-      - name: Build APK
-        run: |
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
 
-          buildozer -v android debug
 
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "17"
 
-        with:
 
-          name: resume-builder-apk
 
-          path: bin/*.apk
+    - name: Install dependencies
+      run: |
+
+        sudo apt update
+
+        sudo apt install -y \
+        build-essential \
+        git \
+        zip \
+        unzip \
+        autoconf \
+        automake \
+        libtool \
+        libtool-bin \
+        pkg-config \
+        libffi-dev \
+        libssl-dev \
+        zlib1g-dev \
+        libsdl2-dev \
+        libsdl2-image-dev \
+        libsdl2-mixer-dev \
+        libsdl2-ttf-dev
+
+
+
+    - name: Install Python tools
+      run: |
+
+        pip install --upgrade pip
+
+        pip install setuptools
+
+        pip install cython==0.29.36
+
+        pip install buildozer==1.5.0
+
+
+
+    - name: Cache Buildozer
+      uses: actions/cache@v4
+      with:
+
+        path: |
+
+          ~/.buildozer
+          .buildozer
+
+        key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+
+        restore-keys:
+
+          buildozer-${{ runner.os }}-
+
+
+
+    - name: Build APK
+
+      env:
+
+        ANDROIDAPI: 31
+
+        ANDROIDMINAPI: 24
+
+        ANDROIDNDK: 28c
+
+
+      run: |
+
+        yes | buildozer -v android debug
+
+
+
+    - name: Upload APK
+
+      uses: actions/upload-artifact@v4
+
+      with:
+
+        name: resume-builder-apk
+
+        path: bin/*.apk
