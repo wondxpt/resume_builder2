@@ -2,18 +2,12 @@ name: Build Android APK
 
 on:
   push:
-    branches:
-      - main
-
-  workflow_dispatch:
-
+    branches: [ main ]
+  workflow_dispatch: {}
 
 jobs:
-
   build:
-
     runs-on: ubuntu-22.04
-
 
     steps:
 
@@ -21,100 +15,89 @@ jobs:
         uses: actions/checkout@v4
 
 
-
-      - name: Setup Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11.7"
+          python-version: "3.11"
 
 
-
-      - name: Setup Java 17
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
 
-
       - name: Install system dependencies
         run: |
+          sudo apt-get update
 
-          sudo apt update
+          sudo apt-get install -y \
+            autoconf \
+            automake \
+            libtool \
+            libtool-bin \
+            pkg-config \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            libffi-dev \
+            libssl-dev \
+            zlib1g-dev \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libportmidi-dev \
+            libswscale-dev \
+            libavformat-dev \
+            libavcodec-dev
 
-          sudo apt install -y \
-          autoconf \
-          automake \
-          libtool \
-          libtool-bin \
-          pkg-config \
-          build-essential \
-          git \
-          zip \
-          unzip \
-          openjdk-17-jdk \
-          libffi-dev \
-          libssl-dev \
-          zlib1g-dev \
-          libsdl2-dev \
-          libsdl2-image-dev \
-          libsdl2-mixer-dev \
-          libsdl2-ttf-dev
 
-
-
-      - name: Install Python build tools
+      - name: Install Buildozer
         run: |
-
           python -m pip install --upgrade pip
-
-          pip install \
-          setuptools \
-          wheel \
-          buildozer==1.5.0 \
-          cython==0.29.36
+          pip install buildozer==1.5.0
+          pip install cython==0.29.36
 
 
+      - name: Cache Buildozer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+            .buildozer
+          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            buildozer-${{ runner.os }}-
 
-      - name: Accept Android licenses
+
+      - name: Prepare python-for-android
         run: |
+          buildozer android update
 
-          yes | sdkmanager --licenses || true
+          P4A_DIR=$(find ~/.buildozer -type d -name "python-for-android" | head -1)
 
+          echo "python-for-android location:"
+          echo $P4A_DIR
 
-
-      - name: Remove old Buildozer cache
-        run: |
-
-          rm -rf ~/.buildozer
-
-
-
-      - name: Create Buildozer directory
-        run: |
-
-          mkdir -p ~/.buildozer
-
+          if [ -d "$P4A_DIR/pythonforandroid/recipes/reportlab" ]; then
+            echo "Removing broken reportlab recipe..."
+            rm -rf "$P4A_DIR/pythonforandroid/recipes/reportlab"
+          else
+            echo "Reportlab recipe not found"
+          fi
 
 
       - name: Build APK
-        env:
-
-          P4A_RELEASE_KEYSTORE: ""
-
         run: |
-
-          yes | buildozer android clean
-
           yes | buildozer -v android debug
-
 
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
-
         with:
-
           name: resume-builder-apk
-
           path: bin/*.apk
