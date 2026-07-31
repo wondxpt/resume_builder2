@@ -4,97 +4,115 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
 
 
 jobs:
-
   build:
 
     runs-on: ubuntu-22.04
 
+
     steps:
 
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
 
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: "17"
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
 
 
-    - name: Install system dependencies
-      run: |
-        sudo apt update
+      - name: Install Linux dependencies
+        run: |
 
-        sudo apt install -y \
-        build-essential \
-        git \
-        zip \
-        unzip \
-        autoconf \
-        automake \
-        libtool \
-        pkg-config \
-        libffi-dev \
-        libssl-dev \
-        zlib1g-dev
+          sudo apt update
 
-
-    - name: Install Android SDK packages
-      run: |
-
-        echo "Accept licenses"
-
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          sudo apt install -y \
+          git \
+          zip \
+          unzip \
+          openjdk-17-jdk \
+          autoconf \
+          automake \
+          libtool \
+          pkg-config \
+          zlib1g-dev \
+          libffi-dev \
+          libssl-dev \
+          cmake
 
 
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-        "platform-tools" \
-        "platforms;android-31" \
-        "build-tools;31.0.0"
+      - name: Install Buildozer
+
+        run: |
+
+          pip install --upgrade pip
+
+          pip install setuptools
+
+          pip install cython==0.29.36
+
+          pip install buildozer==1.5.0
 
 
-    - name: Install Buildozer
-      run: |
 
-        pip install --upgrade pip
+      - name: Cache Buildozer
 
-        pip install cython==0.29.36
+        uses: actions/cache@v4
 
-        pip install buildozer==1.5.0
+        with:
 
+          path: |
 
-    - name: Cache Buildozer
-      uses: actions/cache@v4
-      with:
+            ~/.buildozer
 
-        path: |
-          ~/.buildozer
-          .buildozer
-
-        key: buildozer-${{ hashFiles('buildozer.spec') }}
+            .buildozer
 
 
-    - name: Build APK
-      run: |
+          key: buildozer-cache-${{ hashFiles('buildozer.spec') }}
 
-        buildozer -v android debug
+          restore-keys: |
+
+            buildozer-cache-
 
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
 
-        name: resume-builder-apk
+      - name: Accept Android licenses
 
-        path: bin/*.apk
+        run: |
+
+          mkdir -p ~/.android
+
+          touch ~/.android/repositories.cfg
+
+          yes | buildozer android update
+
+
+      - name: Build APK
+
+        run: |
+
+          buildozer -v android debug
+
+
+
+      - name: Upload APK
+
+        uses: actions/upload-artifact@v4
+
+        with:
+
+          name: resume-builder-apk
+
+          path: bin/*.apk
