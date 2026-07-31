@@ -1,4 +1,5 @@
 [app]
+
 source.dir = .
 title = Resume Builder
 package.name = resumebuilder
@@ -8,9 +9,8 @@ version = 1.0.0
 requirements = python3,kivy==2.3.0,kivymd==2.0.0,pillow,plyer,setuptools,reportlab==4.2.5
 
 orientation = portrait
-# اگر فایل آیکون یا اسپلش ندارید، دو خط زیر را کامنت کنید
-# icon.filename = icon.png
-# presplash.filename = presplash.png
+icon.filename = icon.png
+presplash.filename = presplash.png
 
 android.api = 31
 android.minapi = 21
