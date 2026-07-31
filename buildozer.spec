@@ -36,8 +36,4 @@ android.archs = arm64-v8a,armeabi-v7a
 
 android.enable_androidx = True
 
-android.accept_sdk_license = True
-
 android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
-
-android.skip_update = False
