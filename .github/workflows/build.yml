@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 
@@ -14,134 +13,88 @@ jobs:
 
     runs-on: ubuntu-22.04
 
-
     steps:
 
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
 
 
-
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "17"
 
 
-      - name: Install system dependencies
-        run: |
+    - name: Install system dependencies
+      run: |
+        sudo apt update
 
-          sudo apt update
-
-          sudo apt install -y \
-            autoconf \
-            automake \
-            libtool \
-            libtool-bin \
-            pkg-config \
-            build-essential \
-            git \
-            zip \
-            unzip \
-            wget \
-            libffi-dev \
-            libssl-dev \
-            zlib1g-dev \
-            openjdk-17-jdk
+        sudo apt install -y \
+        build-essential \
+        git \
+        zip \
+        unzip \
+        autoconf \
+        automake \
+        libtool \
+        pkg-config \
+        libffi-dev \
+        libssl-dev \
+        zlib1g-dev
 
 
+    - name: Install Android SDK packages
+      run: |
 
-      # پیدا کردن sdkmanager
-      - name: Setup Android SDK path
-        run: |
+        echo "Accept licenses"
 
-          echo "Searching sdkmanager..."
-
-          SDKMANAGER=$(find $ANDROID_HOME -name sdkmanager -type f | head -1)
-
-          echo "SDKMANAGER=$SDKMANAGER"
-
-          if [ -z "$SDKMANAGER" ]; then
-            echo "sdkmanager not found"
-            exit 1
-          fi
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
 
-          echo "SDKMANAGER_PATH=$SDKMANAGER" >> $GITHUB_ENV
-
-          echo "$(dirname $SDKMANAGER)" >> $GITHUB_PATH
-
-
-
-      # نصب SDK
-      - name: Install Android SDK packages
-        run: |
-
-          yes | $SDKMANAGER_PATH --licenses || true
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+        "platform-tools" \
+        "platforms;android-31" \
+        "build-tools;31.0.0"
 
 
-          $SDKMANAGER_PATH \
-          "platform-tools" \
-          "platforms;android-31" \
-          "build-tools;31.0.0"
+    - name: Install Buildozer
+      run: |
+
+        pip install --upgrade pip
+
+        pip install cython==0.29.36
+
+        pip install buildozer==1.5.0
 
 
+    - name: Cache Buildozer
+      uses: actions/cache@v4
+      with:
 
-      - name: Install Buildozer
-        run: |
+        path: |
+          ~/.buildozer
+          .buildozer
 
-          pip install --upgrade pip
-
-          pip install setuptools
-
-          pip install cython==0.29.36
-
-          pip install buildozer==1.5.0
+        key: buildozer-${{ hashFiles('buildozer.spec') }}
 
 
+    - name: Build APK
+      run: |
+
+        buildozer -v android debug
 
 
-      - name: Cache Buildozer
-        uses: actions/cache@v4
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
 
-        with:
+        name: resume-builder-apk
 
-          path: |
-
-            ~/.buildozer
-
-          key:
-
-            buildozer-${{ hashFiles('buildozer.spec') }}
-
-          restore-keys:
-
-            buildozer-
-
-
-
-      - name: Build APK
-        run: |
-
-          buildozer -v android debug
-
-
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-
-        with:
-
-          name: resume-builder-apk
-
-          path: bin/*.apk
+        path: bin/*.apk
