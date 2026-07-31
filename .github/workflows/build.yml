@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
 
 
@@ -17,104 +18,120 @@ jobs:
     steps:
 
 
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
 
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
 
 
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: "17"
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
 
 
 
-    - name: Install dependencies
-      run: |
+      - name: Install system packages
+        run: |
 
-        sudo apt update
+          sudo apt update
 
-        sudo apt install -y \
-        build-essential \
-        git \
-        zip \
-        unzip \
-        autoconf \
-        automake \
-        libtool \
-        libtool-bin \
-        pkg-config \
-        libffi-dev \
-        libssl-dev \
-        zlib1g-dev \
-        libsdl2-dev \
-        libsdl2-image-dev \
-        libsdl2-mixer-dev \
-        libsdl2-ttf-dev
-
-
-
-    - name: Install Python tools
-      run: |
-
-        pip install --upgrade pip
-
-        pip install setuptools
-
-        pip install cython==0.29.36
-
-        pip install buildozer==1.5.0
+          sudo apt install -y \
+          autoconf \
+          automake \
+          libtool \
+          libtool-bin \
+          pkg-config \
+          build-essential \
+          git \
+          zip \
+          unzip \
+          openjdk-17-jdk \
+          libffi-dev \
+          libssl-dev \
+          zlib1g-dev \
+          libsdl2-dev \
+          libsdl2-image-dev \
+          libsdl2-mixer-dev \
+          libsdl2-ttf-dev
 
 
 
-    - name: Cache Buildozer
-      uses: actions/cache@v4
-      with:
+      - name: Install Build tools
+        run: |
 
-        path: |
+          pip install --upgrade pip
 
-          ~/.buildozer
-          .buildozer
+          pip install setuptools
 
-        key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          pip install cython==0.29.36
 
-        restore-keys:
-
-          buildozer-${{ runner.os }}-
+          pip install buildozer==1.5.0
 
 
 
-    - name: Build APK
+      - name: Cache Buildozer
 
-      env:
+        uses: actions/cache@v4
 
-        ANDROIDAPI: 31
+        with:
 
-        ANDROIDMINAPI: 24
+          path: |
 
-        ANDROIDNDK: 28c
+            ~/.buildozer
 
-
-      run: |
-
-        yes | buildozer -v android debug
+            .buildozer
 
 
+          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
-    - name: Upload APK
 
-      uses: actions/upload-artifact@v4
+          restore-keys: |
 
-      with:
+            buildozer-${{ runner.os }}-
 
-        name: resume-builder-apk
 
-        path: bin/*.apk
+
+      # حذف کش ناقص دانلودها
+      - name: Clean failed downloads
+        run: |
+
+          rm -rf ~/.buildozer/android/packages/freetype* || true
+
+          rm -rf .buildozer/android/platform/build-* || true
+
+
+
+      - name: Build APK
+
+        env:
+
+          ANDROIDAPI: 31
+
+          ANDROIDMINAPI: 24
+
+          ANDROIDNDK: 28c
+
+
+        run: |
+
+          buildozer -v android debug
+
+
+
+      - name: Upload APK
+
+        uses: actions/upload-artifact@v4
+
+        with:
+
+          name: resume-builder-apk
+
+          path: bin/*.apk
