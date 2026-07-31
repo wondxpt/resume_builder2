@@ -2,14 +2,11 @@ name: Build Android APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
-
 
 jobs:
   build:
-
     runs-on: ubuntu-22.04
 
     steps:
@@ -18,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
 
-      - name: Setup Python 3.11
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -31,7 +28,7 @@ jobs:
           java-version: "17"
 
 
-      - name: Install system dependencies
+      - name: Install dependencies
         run: |
           sudo apt update
 
@@ -52,28 +49,20 @@ jobs:
           libsdl2-dev \
           libsdl2-image-dev \
           libsdl2-mixer-dev \
-          libsdl2-ttf-dev \
-          libportmidi-dev \
-          libswscale-dev \
-          libavformat-dev \
-          libavcodec-dev
+          libsdl2-ttf-dev
 
 
       - name: Install Buildozer
         run: |
-
-          python -m pip install --upgrade pip
-
-          pip install \
-          buildozer==1.5.0 \
-          cython==0.29.36 \
-          setuptools
+          pip install --upgrade pip
+          pip install setuptools
+          pip install cython==0.29.36
+          pip install buildozer==1.5.0
 
 
       - name: Cache Buildozer
         uses: actions/cache@v4
         with:
-
           path: |
             ~/.buildozer
             .buildozer
@@ -84,51 +73,42 @@ jobs:
             buildozer-${{ runner.os }}-
 
 
-      - name: Prepare python-for-android
+      # مهم: حذف recipe خراب ReportLab
+      - name: Remove broken reportlab recipe
         run: |
 
-          buildozer android p4a --help || true
-
-
-
-      - name: Remove broken ReportLab recipe
-
-        run: |
-
-          P4A_DIR=$(find ~/.buildozer -type d -name "python-for-android" | head -1)
+          P4A=$(find ~/.buildozer -type d -name "python-for-android" | head -1)
 
           echo "P4A PATH:"
-          echo $P4A_DIR
+          echo $P4A
 
+          if [ -d "$P4A/pythonforandroid/recipes/reportlab" ]; then
 
-          if [ -d "$P4A_DIR/pythonforandroid/recipes/reportlab" ]; then
+            rm -rf "$P4A/pythonforandroid/recipes/reportlab"
 
-              rm -rf "$P4A_DIR/pythonforandroid/recipes/reportlab"
-
-              echo "ReportLab recipe removed"
+            echo "Reportlab recipe removed"
 
           else
 
-              echo "ReportLab recipe not found"
+            echo "Reportlab recipe not found"
 
           fi
 
 
 
       - name: Build APK
-
         env:
-
-          ANDROID_NDK_VERSION: "25b"
+          ANDROIDAPI: 31
+          ANDROIDMINAPI: 24
+          ANDROIDNDK: 28c
 
         run: |
 
-          yes | buildozer -v android debug
+          yes | buildozer android debug -v
 
 
 
       - name: Upload APK
-
         uses: actions/upload-artifact@v4
 
         with:
