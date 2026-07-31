@@ -53,9 +53,15 @@ jobs:
           mkdir -p cmdline-tools/latest
           mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
 
+      - name: Create symlink for sdkmanager (fix for Buildozer)
+        run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
+          ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+          chmod +x ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+
       - name: Accept SDK licenses and install build-tools
         run: |
-          export PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin
+          export PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/tools/bin
           yes | sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
           sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platform-tools"
           sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platforms;android-31"
@@ -75,7 +81,7 @@ jobs:
           export ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r28c
           export ANDROIDAPI=31
           export ANDROIDMINAPI=21
-          export PATH=$PATH:$ANDROIDSDK/cmdline-tools/latest/bin:$ANDROIDSDK/build-tools/37.0.0
+          export PATH=$PATH:$ANDROIDSDK/tools/bin:$ANDROIDSDK/build-tools/37.0.0
           echo y | buildozer -v android debug
 
       - name: Upload APK
