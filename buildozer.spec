@@ -1,22 +1,34 @@
 [app]
 
-# (نام و تنظیمات دیگر)
+# ===== اطلاعات پایه =====
+title = Resume Builder
+package.name = resumebuilder
+package.domain = com.example
+source.dir = .
+version = 1.0.0
+version.code = 1
 
-requirements = python3,kivy==2.3.0,kivymd==2.0.0,pillow,plyer,setuptools
+# ===== وابستگی‌ها =====
+requirements = python3,kivy==2.3.0,kivymd==2.0.0,pillow,plyer,setuptools,openssl
 
-# تنظیمات اندروید
-android.accept_sdk_license = True
+# ===== تنظیمات اندروید =====
+android.api = 31
 android.ndk = 28c
 android.sdk = 37
 android.minapi = 21
-android.api = 31
+android.accept_sdk_license = True
 android.arch = arm64-v8a, armeabi-v7a
+android.permissions = INTERNET, ACCESS_NETWORK_STATE
 
-# متغیرهای محیطی برای python-for-android (آدرس جایگزین)
+# ===== متغیر محیطی برای رفع خطای ۵۰۲ =====
 android.environment_variables = 
     P4A_FREETYPE_URL = https://sourceforge.net/projects/freetype/files/freetype2/2.14.1/freetype-2.14.1.tar.gz/download
 
-# سایر تنظیمات
+# ===== تنظیمات دیگر =====
+android.gradle = True
+android.ndk_api = 21
 android.allow_backup = True
-android.permissions = INTERNET
-android.manifest.add_hardware = android.hardware.touchscreen
+
+[buildozer]
+log_level = 2
+warn_on_root = 1
