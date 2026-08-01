@@ -18,6 +18,7 @@ android.api = 35
 android.minapi = 24
 android.ndk = 25b
 p4a.branch = v2024.01.21
+p4a.extra_args = --blacklist-requirements=_uuid
 android.archs = arm64-v8a
 android.permissions = READ_MEDIA_IMAGES, READ_EXTERNAL_STORAGE
 android.presplash_color = #FFFFFF
