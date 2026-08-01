@@ -1,28 +1,30 @@
 [app]
+
 title = Resume Builder
 package.name = resumebuilder
-package.domain = com.example
+package.domain = com.wondxpt
 source.dir = .
-version = 1.0.0
-version.code = 1
+source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf
+version = 1.0
 
-requirements = python3,kivy==2.3.0,kivymd==2.0.0,plyer,setuptools
+requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow,plyer,android
 
-android.api = 31
-android.ndk = 23c
-android.minapi = 21
+orientation = portrait
+fullscreen = 0
+icon.filename = %(source.dir)s/icon.png
+presplash.filename = %(source.dir)s/presplash.png
+
+android.api = 35
+android.minapi = 24
+android.ndk = 25b
+p4a.branch = v2024.01.21
+android.archs = arm64-v8a, armeabi-v7a
+android.permissions = READ_MEDIA_IMAGES, READ_EXTERNAL_STORAGE
+android.presplash_color = #FFFFFF
+android.enable_androidx = True
 android.accept_sdk_license = True
-android.archs = arm64-v8a
-android.permissions = INTERNET, ACCESS_NETWORK_STATE
-android.environment_variables = 
-    P4A_FREETYPE_URL = https://sourceforge.net/projects/freetype/files/freetype2/2.14.1/freetype-2.14.1.tar.gz/download
-android.gradle = True
-android.ndk_api = 21
-android.allow_backup = True
-
-# ✅ جدید: جلوگیری از حذف کتابخانه‌ها
-android.p4a_whitelist = openssl,libffi,sdl2,sdl2_image,sdl2_mixer,sdl2_ttf
 
 [buildozer]
+
 log_level = 2
 warn_on_root = 1
