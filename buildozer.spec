@@ -5,7 +5,7 @@ package.domain = com.example
 source.dir = .
 version = 1.0.0
 version.code = 1
-requirements = python3,kivy==2.3.0,kivymd==2.0.0,plyer,setuptools
+requirements = python3==3.11.0,kivy==2.3.0,kivymd==2.0.0,plyer,setuptools
 android.api = 31
 android.ndk = 25c
 android.minapi = 21
