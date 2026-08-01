@@ -8,19 +8,20 @@ source.dir = .
 version = 1.0.0
 version.code = 1
 
-# ===== وابستگی‌ها =====
-requirements = python3,kivy==2.3.0,kivymd==2.0.0,pillow,plyer,setuptools,openssl
+# ===== وابستگی‌ها (بدون pillow برای جلوگیری از خطای کامپایل) =====
+requirements = python3,kivy==2.3.0,kivymd==2.0.0,plyer,setuptools
 
 # ===== تنظیمات اندروید =====
 android.api = 31
-android.ndk = 28c
-android.sdk = 37
+android.ndk = 25c  # NDK 25c پایدارتر
 android.minapi = 21
 android.accept_sdk_license = True
-android.arch = arm64-v8a, armeabi-v7a
+android.archs = arm64-v8a, armeabi-v7a
+
+# ===== مجوزها =====
 android.permissions = INTERNET, ACCESS_NETWORK_STATE
 
-# ===== متغیر محیطی برای رفع خطای ۵۰۲ =====
+# ===== متغیرهای محیطی برای رفع خطای ۵۰۲ =====
 android.environment_variables = 
     P4A_FREETYPE_URL = https://sourceforge.net/projects/freetype/files/freetype2/2.14.1/freetype-2.14.1.tar.gz/download
 
@@ -28,6 +29,9 @@ android.environment_variables =
 android.gradle = True
 android.ndk_api = 21
 android.allow_backup = True
+
+# ===== اگر pillow مشکل داشت، این را اضافه کنید =====
+# android.p4a_whitelist = pillow
 
 [buildozer]
 log_level = 2
