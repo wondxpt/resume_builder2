@@ -45,21 +45,15 @@ jobs:
         pip install buildozer==1.5.0
         pip install setuptools
 
-    - name: Download freetype manually (to avoid 502 error)
+    - name: Download freetype manually
       run: |
         mkdir -p ~/.buildozer/cache
-        echo "Downloading freetype from SourceForge mirror..."
         wget -O ~/.buildozer/cache/freetype-2.14.1.tar.gz \
           https://sourceforge.net/projects/freetype/files/freetype2/2.14.1/freetype-2.14.1.tar.gz/download || \
-        echo "SourceForge failed, trying GitHub mirror..."
         wget -O ~/.buildozer/cache/freetype-2.14.1.tar.gz \
           https://github.com/freetype/freetype/releases/download/VER-2-14-1/freetype-2.14.1.tar.gz || \
-        echo "GitHub failed, trying China mirror..."
         wget -O ~/.buildozer/cache/freetype-2.14.1.tar.gz \
-          https://mirrors.ustc.edu.cn/gnu/freetype/freetype-2.14.1.tar.gz || \
-        echo "All mirrors failed, but continuing..."
-        
-        echo "Downloading reportlab..."
+          https://mirrors.ustc.edu.cn/gnu/freetype/freetype-2.14.1.tar.gz || true
         wget -O ~/.buildozer/cache/reportlab-4.2.0.tar.gz \
           https://files.pythonhosted.org/packages/source/r/reportlab/reportlab-4.2.0.tar.gz || true
 
@@ -90,7 +84,6 @@ jobs:
         ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
         chmod +x ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
         export PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/tools/bin
-        
         yes | sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
         sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platform-tools"
         sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platforms;android-31"
@@ -110,10 +103,8 @@ jobs:
         export ANDROIDAPI=31
         export ANDROIDMINAPI=21
         export PATH=$PATH:$ANDROIDSDK/tools/bin:$ANDROIDSDK/build-tools/37.0.0
-        
         export P4A_FREETYPE_URL="https://sourceforge.net/projects/freetype/files/freetype2/2.14.1/freetype-2.14.1.tar.gz/download"
         export P4A_USE_CCACHE=0
-        
         echo y | buildozer -v android debug
 
     - name: Upload APK artifact
