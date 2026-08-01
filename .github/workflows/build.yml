@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -58,7 +59,6 @@ jobs:
           https://mirrors.ustc.edu.cn/gnu/freetype/freetype-2.14.1.tar.gz || \
         echo "All mirrors failed, but continuing..."
         
-        # دانلود reportlab هم برای اطمینان
         echo "Downloading reportlab..."
         wget -O ~/.buildozer/cache/reportlab-4.2.0.tar.gz \
           https://files.pythonhosted.org/packages/source/r/reportlab/reportlab-4.2.0.tar.gz || true
@@ -69,7 +69,7 @@ jobs:
         path: |
           ~/.buildozer/cache
           ~/.buildozer/android/platform/android-sdk
-          ~/.buildozer/android/platform/android-ndk-r28c
+          ~/.buildozer/android/platform/android-ndk-r25c
         key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
         restore-keys: |
           ${{ runner.os }}-buildozer-
@@ -91,10 +91,7 @@ jobs:
         chmod +x ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
         export PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/tools/bin
         
-        # Accept licenses
         yes | sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
-        
-        # Install required components
         sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platform-tools"
         sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platforms;android-31"
         sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;37.0.0"
@@ -109,13 +106,13 @@ jobs:
       run: |
         export JAVA_HOME=$JAVA_HOME_17_X64
         export ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk
-        export ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r28c
+        export ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r25c
         export ANDROIDAPI=31
         export ANDROIDMINAPI=21
         export PATH=$PATH:$ANDROIDSDK/tools/bin:$ANDROIDSDK/build-tools/37.0.0
         
-        # Set custom freetype URL to avoid 502 error (fallback if manual download failed)
         export P4A_FREETYPE_URL="https://sourceforge.net/projects/freetype/files/freetype2/2.14.1/freetype-2.14.1.tar.gz/download"
+        export P4A_USE_CCACHE=0
         
         echo y | buildozer -v android debug
 
