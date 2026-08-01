@@ -5,7 +5,7 @@ package.name = resumebuilder
 package.domain = org.yourdomain
 version = 1.0.0
 
-requirements = python3,kivy==2.4.0,kivymd==2.0.0,pillow,plyer,setuptools
+requirements = python3,kivy==2.3.0,kivymd==2.0.0,pillow,plyer,setuptools
 
 orientation = portrait
 icon.filename = icon.png
