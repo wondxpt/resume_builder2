@@ -41,7 +41,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         pip install --upgrade pip
-        pip install cython==0.29.36
+        pip install cython==3.0.10
         pip install buildozer==1.5.0
         pip install setuptools
 
@@ -63,7 +63,7 @@ jobs:
         path: |
           ~/.buildozer/cache
           ~/.buildozer/android/platform/android-sdk
-          ~/.buildozer/android/platform/android-ndk-r28c
+          ~/.buildozer/android/platform/android-ndk-r23c
         key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
         restore-keys: |
           ${{ runner.os }}-buildozer-
@@ -99,7 +99,7 @@ jobs:
       run: |
         export JAVA_HOME=$JAVA_HOME_17_X64
         export ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk
-        export ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r28c
+        export ANDROIDNDK=$HOME/.buildozer/android/platform/android-ndk-r23c
         export ANDROIDAPI=31
         export ANDROIDMINAPI=21
         export PATH=$PATH:$ANDROIDSDK/tools/bin:$ANDROIDSDK/build-tools/37.0.0
