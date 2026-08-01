@@ -9,18 +9,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Java
+    - name: Setup Java
       uses: actions/setup-java@v4
       with:
         distribution: temurin
         java-version: 17
 
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
@@ -37,22 +37,42 @@ jobs:
           libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
         sudo apt clean
 
-    - name: Install Python packages
+    - name: Install Python dependencies
       run: |
         pip install --upgrade pip
         pip install cython==0.29.36
         pip install buildozer==1.5.0
         pip install setuptools
 
-    - name: Pre-cache packages (fix 502 & 404 errors)
+    - name: Download freetype manually (to avoid 502 error)
       run: |
         mkdir -p ~/.buildozer/cache
+        echo "Downloading freetype from SourceForge mirror..."
         wget -O ~/.buildozer/cache/freetype-2.14.1.tar.gz \
-          https://mirrors.kernel.org/gnu/freetype/freetype-2.14.1.tar.gz || \
+          https://sourceforge.net/projects/freetype/files/freetype2/2.14.1/freetype-2.14.1.tar.gz/download || \
+        echo "SourceForge failed, trying GitHub mirror..."
         wget -O ~/.buildozer/cache/freetype-2.14.1.tar.gz \
-          https://download.savannah.gnu.org/releases/freetype/freetype-2.14.1.tar.gz || true
+          https://github.com/freetype/freetype/releases/download/VER-2-14-1/freetype-2.14.1.tar.gz || \
+        echo "GitHub failed, trying China mirror..."
+        wget -O ~/.buildozer/cache/freetype-2.14.1.tar.gz \
+          https://mirrors.ustc.edu.cn/gnu/freetype/freetype-2.14.1.tar.gz || \
+        echo "All mirrors failed, but continuing..."
+        
+        # دانلود reportlab هم برای اطمینان
+        echo "Downloading reportlab..."
         wget -O ~/.buildozer/cache/reportlab-4.2.0.tar.gz \
           https://files.pythonhosted.org/packages/source/r/reportlab/reportlab-4.2.0.tar.gz || true
+
+    - name: Cache buildozer downloads
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.buildozer/cache
+          ~/.buildozer/android/platform/android-sdk
+          ~/.buildozer/android/platform/android-ndk-r28c
+        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+        restore-keys: |
+          ${{ runner.os }}-buildozer-
 
     - name: Setup Android SDK
       run: |
@@ -64,13 +84,17 @@ jobs:
         mkdir -p cmdline-tools/latest
         mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
 
-    - name: Setup SDK tools and accept licenses
+    - name: Setup SDK tools
       run: |
         mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
         ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
         chmod +x ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
         export PATH=$PATH:$HOME/.buildozer/android/platform/android-sdk/tools/bin
+        
+        # Accept licenses
         yes | sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
+        
+        # Install required components
         sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platform-tools"
         sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platforms;android-31"
         sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;37.0.0"
@@ -79,7 +103,9 @@ jobs:
       run: |
         echo "$HOME/.buildozer/android/platform/android-sdk/build-tools/37.0.0" >> $GITHUB_PATH
 
-    - name: Build with buildozer
+    - name: Build APK with buildozer
+      env:
+        JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
       run: |
         export JAVA_HOME=$JAVA_HOME_17_X64
         export ANDROIDSDK=$HOME/.buildozer/android/platform/android-sdk
@@ -87,10 +113,15 @@ jobs:
         export ANDROIDAPI=31
         export ANDROIDMINAPI=21
         export PATH=$PATH:$ANDROIDSDK/tools/bin:$ANDROIDSDK/build-tools/37.0.0
+        
+        # Set custom freetype URL to avoid 502 error (fallback if manual download failed)
+        export P4A_FREETYPE_URL="https://sourceforge.net/projects/freetype/files/freetype2/2.14.1/freetype-2.14.1.tar.gz/download"
+        
         echo y | buildozer -v android debug
 
-    - name: Upload APK
+    - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: resume-builder-apk
+        name: app-unsigned
         path: bin/*.apk
+        if-no-files-found: ignore
